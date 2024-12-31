@@ -21,22 +21,20 @@ function App() {
             defaultSelectedKeys={['home']}
             defaultOpenKeys={['myProjects']}
             style={{ marginTop: '3vh', background: 'inherit', border: 'none' }}
-            itemStyle={{ padding: '4px 16px', margin: 0 }} // Decrease spacing
           >
-            <Menu.Item key="addTask">Add Task</Menu.Item>
-            <Menu.Item key="search">Search</Menu.Item>
-            <Menu.Item key="inbox">Inbox</Menu.Item>
-            <Menu.Item key="today">Today</Menu.Item>
-            <Menu.Item key="upcoming">Upcoming</Menu.Item>
-            <Menu.Item key="filters">Filters & Labels</Menu.Item>
-            
-            {/* SubMenu for "My Projects" */}
+            <Menu.Item key="addTask" style={{ padding: '4px 16px', margin: 0 }}>Add Task</Menu.Item>
+            <Menu.Item key="search" style={{ padding: '4px 16px', margin: 0 }}>Search</Menu.Item>
+            <Menu.Item key="inbox" style={{ padding: '4px 16px', margin: 0 }}>Inbox</Menu.Item>
+            <Menu.Item key="today" style={{ padding: '4px 16px', margin: 0 }}>Today</Menu.Item>
+            <Menu.Item key="upcoming" style={{ padding: '4px 16px', margin: 0 }}>Upcoming</Menu.Item>
+            <Menu.Item key="filters" style={{ padding: '4px 16px', margin: 0 }}>Filters & Labels</Menu.Item>
             <SubMenu key="myProjects" title="My Projects">
-              <Menu.Item key="home">Home</Menu.Item>
-              <Menu.Item key="myWork">My Work</Menu.Item>
-              <Menu.Item key="education">Education</Menu.Item>
+              <Menu.Item key="home" style={{ padding: '4px 16px', margin: 0 }}>Home</Menu.Item>
+              <Menu.Item key="myWork" style={{ padding: '4px 16px', margin: 0 }}>My Work</Menu.Item>
+              <Menu.Item key="education" style={{ padding: '4px 16px', margin: 0 }}>Education</Menu.Item>
             </SubMenu>
           </Menu>
+
         </Sider>
         <Layout>
           <Header style={{ background: 'white' }}>Header</Header>
