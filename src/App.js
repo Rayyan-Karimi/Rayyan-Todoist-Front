@@ -1,40 +1,73 @@
 import './App.css';
 import { Layout, Avatar, Button, Menu } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+// import { TodoistApi } from "@doist/todoist-api-typescript";
 
 const { Header, Footer, Sider, Content } = Layout;
-const { SubMenu } = Menu;
+
+// const api = new TodoistApi("cf40653b3b769c7ac911487e225d9caccec90be9"); // Use an environment variable
 
 function App() {
+  // const [projects, setProjects] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [hasError, setHasError] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("hello")
+  //   api.getProjects()
+  //     .then((projects) => console.log(projects))
+  //     .catch((error) => console.log(error))
+  // }, []);
+  
+  // if (isLoading) {
+  //   return (
+  //     <main>
+  //       <div role="status">Loading...</div>
+  //     </main>
+  //   );
+  // }
+
+  // if (hasError) {
+  //   return (
+  //     <main>
+  //       <div role="alert">Error loading data. Please try again later.</div>
+  //     </main>
+  //   );
+  // }
+
+  const menuItems = [
+    { label: 'Add Task', key: 'addTask' },
+    { label: 'Search', key: 'search' },
+    { label: 'Inbox', key: 'inbox' },
+    { label: 'Today', key: 'today' },
+    { label: 'Upcoming', key: 'upcoming' },
+    { label: 'Filters & Labels', key: 'filters' },
+    {
+      label: 'My Projects',
+      key: 'myProjects',
+      children: projects.map((project) => ({
+        label: project.name,
+        key: project.id,
+      })),
+    },
+  ];
+
   return (
     <div className="App">
       <Layout>
         <Sider style={{ padding: '1vh', background: 'lightYellow', minHeight: '100vh' }}>
-          {/* Avatar Button */}
           <Button style={{ border: 'none', background: 'inherit' }}>
             <Avatar icon={<UserOutlined />} />
           </Button>
-          {/* Menu */}
           <Menu
             mode="inline"
-            defaultSelectedKeys={['home']}
+            defaultSelectedKeys={['today']}
             defaultOpenKeys={['myProjects']}
+            items={menuItems}
             style={{ marginTop: '3vh', background: 'inherit', border: 'none' }}
-          >
-            <Menu.Item key="addTask" style={{ padding: '4px 16px', margin: 0 }}>Add Task</Menu.Item>
-            <Menu.Item key="search" style={{ padding: '4px 16px', margin: 0 }}>Search</Menu.Item>
-            <Menu.Item key="inbox" style={{ padding: '4px 16px', margin: 0 }}>Inbox</Menu.Item>
-            <Menu.Item key="today" style={{ padding: '4px 16px', margin: 0 }}>Today</Menu.Item>
-            <Menu.Item key="upcoming" style={{ padding: '4px 16px', margin: 0 }}>Upcoming</Menu.Item>
-            <Menu.Item key="filters" style={{ padding: '4px 16px', margin: 0 }}>Filters & Labels</Menu.Item>
-            <SubMenu key="myProjects" title="My Projects">
-              <Menu.Item key="home" style={{ padding: '4px 16px', margin: 0 }}>Home</Menu.Item>
-              <Menu.Item key="myWork" style={{ padding: '4px 16px', margin: 0 }}>My Work</Menu.Item>
-              <Menu.Item key="education" style={{ padding: '4px 16px', margin: 0 }}>Education</Menu.Item>
-            </SubMenu>
-          </Menu>
-
+          />
         </Sider>
         <Layout>
           <Header style={{ background: 'white' }}>Header</Header>
