@@ -29,6 +29,9 @@ import {
 import Index from "./components/pages/Index";
 import IndividualProject from "./components/pages/IndividualProject";
 // import DrawerComponent from "./components/util/DrawerComponent";
+import AddProjectIcon from "./assets/AddProjectIcon.svg";
+// import { ReactComponent as AddProjectIcon } from "./assets/AddProjectIcon.svg";
+// import { ReactComponent as TestIcon } from "./assets/TestIcon.svg";
 
 const { Sider, Header, Content, Footer } = Layout;
 
@@ -143,8 +146,14 @@ function App() {
       .then(([fetchedProjects, fetchedTasks]) => {
         setProjects(fetchedProjects.slice(1)); // Exclude the first project
         setTasks(fetchedTasks);
+        console.log("Fetched Projects:", fetchedProjects);
+        console.log("Fetched Tasks:", fetchedTasks);
         setIsLoading(false);
         setHasError(false);
+      })
+      .then(() => {
+        console.log("Projects:", projects);
+        console.log("Tasks:", tasks);
       })
       .catch((error) => {
         console.error(error);
@@ -275,7 +284,6 @@ function App() {
     },
     { label: "Test", key: "/test" }, // Matches the Test route
   ];
-  
 
   return (
     <div className="App">
@@ -347,9 +355,21 @@ function App() {
               border: "none",
             }}
           >
-            <Menu.Item key="add-project" icon={<PlusOutlined />}>
+            <Menu.Item
+              key="add-project"
+              icon={
+                <img
+                  src={AddProjectIcon}
+                  alt="Add Project Icon"
+                  style={{ width: 16, height: 16 }}
+                />
+              }
+            >
               Add Project
             </Menu.Item>
+
+            {/* <TestIcon style={{ width: 24, height: 24 }} /> */}
+
             {menuItems.map((menuItem) => {
               if (menuItem.children && menuItem.children.length > 0) {
                 // Render a SubMenu for items with children
@@ -382,7 +402,11 @@ function App() {
             {/* @TODO: add bbreadcrumbs */}
           </Header>
           <Content style={{ minHeight: "70vh" }}>
-            <ContentDisplay tasks={tasks} />
+            <ContentDisplay
+              tasks={tasks}
+              projects={projects}
+              setTasks={setTasks}
+            />
           </Content>
           <Footer>Todoist Clone ©2024</Footer>
         </Layout>
@@ -500,13 +524,19 @@ function App() {
   );
 }
 
-function ContentDisplay({ tasks }) {
+function ContentDisplay({ tasks, projects, setTasks }) {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
       <Route
         path="/projects/:id"
-        element={<IndividualProject tasks={tasks} />}
+        element={
+          <IndividualProject
+            tasks={tasks}
+            projects={projects}
+            setTasks={setTasks}
+          />
+        }
       />
       <Route path="/test" element={<h3>Test</h3>} />
       <Route
