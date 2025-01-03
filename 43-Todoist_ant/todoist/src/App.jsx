@@ -4,6 +4,8 @@ import {
   ProjectOutlined,
   ProfileOutlined,
   MoreOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import {
   BrowserRouter as Router,
@@ -53,8 +55,10 @@ function App() {
 
   const showProjectActionsModal = (project, type) => {
     setSelectedProject(project);
-    setActionTypeOnProject(type);
+    setActionTypeOnProject(type); // 'edit' or 'delete'
+    console.log("Sleected action:", type);
     setIsEditOrDeleteProjectModalVisible(true);
+    console.log("Modal is viisble");
   };
   const handleCancelForEditOrDeleteProject = () => {
     setIsEditOrDeleteProjectModalVisible(false);
@@ -87,7 +91,10 @@ function App() {
 
   const handleDeleteProject = async () => {
     try {
-      await api.deleteProject(selectedProject.key);
+      await api.deleteProject(selectedProject.id);
+      setProjects((prev) =>
+        prev.filter((project) => project.id !== selectedProject.id)
+      );
       console.log("Deleted project successfully.");
     } catch (err) {
       console.error("Error deleting project:", err);
@@ -162,15 +169,25 @@ function App() {
         .filter((project) => project.isFavorite)
         .map((project) => ({
           label: (
-            <div className="menu-item-container">
-              {project.name}
+            <div
+              className="menu-item-container"
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <div>{project.name}</div>
               <Tooltip title="More Actions">
-                <MoreOutlined
+                <EditOutlined
                   onClick={(e) => {
                     e.stopPropagation();
-                    showProjectActionsModal(project, "more");
+                    showProjectActionsModal(project, "edit");
                   }}
-                  style={{ marginLeft: 8 }}
+                  style={{ marginLeft: 12 }}
+                />
+                <DeleteOutlined
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showProjectActionsModal(project, "delete");
+                  }}
+                  style={{ marginLeft: 12 }}
                 />
               </Tooltip>
             </div>
@@ -183,15 +200,25 @@ function App() {
       icon: <ProfileOutlined />,
       children: projects.map((project) => ({
         label: (
-          <div className="menu-item-container">
-            {project.name}
+          <div
+            className="menu-item-container"
+            style={{ display: "flex", justifyContent: "space-between" }}
+          >
+            <div>{project.name}</div>
             <Tooltip title="More Actions">
-              <MoreOutlined
+              <EditOutlined
                 onClick={(e) => {
                   e.stopPropagation();
-                  showProjectActionsModal(project, "more");
+                  showProjectActionsModal(project, "edit");
                 }}
-                style={{ marginLeft: 8 }}
+                style={{ marginLeft: 12 }}
+              />
+              <DeleteOutlined
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showProjectActionsModal(project, "delete");
+                }}
+                style={{ marginLeft: 12 }}
               />
             </Tooltip>
           </div>
@@ -302,22 +329,22 @@ function App() {
         {/* Right side Layout */}
         <Layout>
           <Header style={{ background: "white" }}>
-            header
+            Todoist Clone
             {/* @TODO: add bbreadcrumbs */}
           </Header>
           <Content style={{ minHeight: "70vh" }}>
             <ContentDisplay tasks={tasks} />
           </Content>
-          <Footer>footer</Footer>
+          <Footer>Todoist Clone ©2024</Footer>
         </Layout>
       </Layout>
 
       {/* Project actions modal */}
       <Modal
         title={
-          actionTypeOnProject === "edit" ? "Edit project" : "Delete Project"
+          actionTypeOnProject === "edit" ? "Edit Project" : "Delete Project"
         }
-        visible={isAddProjectModalVisible}
+        visible={isEditOrDeleteProjectModalVisible}
         onCancel={handleCancelForEditOrDeleteProject}
         footer={null}
       >
@@ -329,7 +356,7 @@ function App() {
           >
             <Form.Item
               label="Project Title"
-              name="projectTitle"
+              name="name"
               initialValue={selectedProject?.name}
               rules={[
                 { required: true, message: "Please input your project name!" },
@@ -422,7 +449,7 @@ function App() {
 function ContentDisplay({ tasks }) {
   return (
     <Routes>
-      <Route path="add-project" element={<Index />} />
+      <Route path="/" element={<Index />} />
       <Route
         path="/projects/:id"
         element={<IndividualProject tasks={tasks} />}
