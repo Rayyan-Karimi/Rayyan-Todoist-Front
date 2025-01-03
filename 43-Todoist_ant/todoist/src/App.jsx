@@ -3,7 +3,8 @@ import {
   PlusOutlined,
   ProjectOutlined,
   ProfileOutlined,
-  MoreOutlined,
+  RightOutlined,
+  DownOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
@@ -51,14 +52,21 @@ function App() {
   ] = useState(false);
   const [actionTypeOnProject, setActionTypeOnProject] = useState("");
   const [selectedProject, setSelectedProject] = useState(null);
-  const editOrDeleteProjectForm = Form.useForm();
+  const [editOrDeleteProjectForm] = Form.useForm();
 
   const showProjectActionsModal = (project, type) => {
+    console.log("sel proj:", project);
     setSelectedProject(project);
     setActionTypeOnProject(type); // 'edit' or 'delete'
     console.log("Sleected action:", type);
     setIsEditOrDeleteProjectModalVisible(true);
     console.log("Modal is viisble");
+    if (type === "edit") {
+      editOrDeleteProjectForm.setFieldsValue({
+        name: project.name,
+        isFavorite: project.isFavorite,
+      });
+    }
   };
   const handleCancelForEditOrDeleteProject = () => {
     setIsEditOrDeleteProjectModalVisible(false);
@@ -68,19 +76,17 @@ function App() {
   };
   const handleEditProjectFormSubmit = async (values) => {
     try {
-      const updatedProject = await api.updateProject(selectedProject.key, {
-        name: values.projectTitle,
+      const updatedProject = await api.updateProject(selectedProject.id, {
+        name: values.name,
+        isFavorite: values.isFavorite,
       });
-      setProjects((prev) => {
-        prev.map((project) => {
-          if (project.key !== updatedProject.key) {
-            return project;
-          } else {
-            return updatedProject; // Return the updated project
-          }
-        });
-      });
-      addProjectForm.resetFields();
+      setProjects((prev) =>
+        prev.map((project) =>
+          project.id !== updatedProject.id ? project : updatedProject
+        )
+      );
+
+      editOrDeleteProjectForm.resetFields();
       console.log("Updated project successfully.");
     } catch (err) {
       console.error("Error updating project:", err);
@@ -163,6 +169,7 @@ function App() {
   const menuItems = [
     // { label: "Add Project", key: "/", icon: <PlusOutlined /> }, // Matches the home route
     {
+      key: "my-favorites",
       label: "My Favorites",
       icon: <ProjectOutlined />,
       children: projects
@@ -196,6 +203,7 @@ function App() {
         })),
     },
     {
+      key: "my-projects",
       label: "My Projects",
       icon: <ProfileOutlined />,
       children: projects.map((project) => ({
@@ -357,12 +365,17 @@ function App() {
             <Form.Item
               label="Project Title"
               name="name"
-              initialValue={selectedProject?.name}
               rules={[
                 { required: true, message: "Please input your project name!" },
               ]}
             >
               <Input />
+            </Form.Item>
+            <Form.Item
+              name="isFavorite"
+              valuePropName="checked" // Ensures the checkbox state is properly managed
+            >
+              <Checkbox>Mark as Favorite</Checkbox>
             </Form.Item>
             <Form.Item>
               <Button
