@@ -167,7 +167,6 @@ function App() {
   };
 
   const menuItems = [
-    // { label: "Add Project", key: "/", icon: <PlusOutlined /> }, // Matches the home route
     {
       key: "my-favorites",
       label: "My Favorites",
@@ -178,25 +177,44 @@ function App() {
           label: (
             <div
               className="menu-item-container"
-              style={{ display: "flex", justifyContent: "space-between" }}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "12px",
+              }}
             >
-              <div>{project.name}</div>
-              <Tooltip title="More Actions">
-                <EditOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showProjectActionsModal(project, "edit");
-                  }}
-                  style={{ marginLeft: 12 }}
-                />
-                <DeleteOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showProjectActionsModal(project, "delete");
-                  }}
-                  style={{ marginLeft: 12 }}
-                />
-              </Tooltip>
+              {/* Name Container */}
+              <div
+                style={{
+                  overflow: "hidden", // Prevent overflow
+                  textOverflow: "ellipsis", // Add ellipsis for long names
+                  maxWidth: 120,
+                }}
+                title={project.name} // Tooltip with the full project name
+              >
+                {project.name}
+              </div>
+              {/* Buttons Container */}
+              <div style={{ display: "flex", gap: "8px" }}>
+                <Tooltip title="Edit Project">
+                  <EditOutlined
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showProjectActionsModal(project, "edit");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  />
+                </Tooltip>
+                <Tooltip title="Delete Project">
+                  <DeleteOutlined
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      showProjectActionsModal(project, "delete");
+                    }}
+                    style={{ cursor: "pointer" }}
+                  />
+                </Tooltip>
+              </div>
             </div>
           ),
           key: `/projects/${project.id}`, // Adjusted path to match route
@@ -210,25 +228,46 @@ function App() {
         label: (
           <div
             className="menu-item-container"
-            style={{ display: "flex", justifyContent: "space-between" }}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: "12px",
+              flexWrap: "nowrap",
+            }}
           >
-            <div>{project.name}</div>
-            <Tooltip title="More Actions">
-              <EditOutlined
-                onClick={(e) => {
-                  e.stopPropagation();
-                  showProjectActionsModal(project, "edit");
-                }}
-                style={{ marginLeft: 12 }}
-              />
-              <DeleteOutlined
-                onClick={(e) => {
-                  e.stopPropagation();
-                  showProjectActionsModal(project, "delete");
-                }}
-                style={{ marginLeft: 12 }}
-              />
-            </Tooltip>
+            {/* Name Container */}
+            <div
+              style={{
+                overflow: "hidden", // Prevent overflow
+                textOverflow: "ellipsis", // Add ellipsis for long names
+                maxWidth: 120,
+              }}
+              title={project.name} // Tooltip with the full project name
+            >
+              {project.name}
+            </div>
+            {/* Buttons Container */}
+            <div style={{ display: "flex", gap: "8px" }}>
+              <Tooltip title="Edit Project">
+                <EditOutlined
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showProjectActionsModal(project, "edit");
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
+              </Tooltip>
+              <Tooltip title="Delete Project">
+                <DeleteOutlined
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showProjectActionsModal(project, "delete");
+                  }}
+                  style={{ cursor: "pointer" }}
+                />
+              </Tooltip>
+            </div>
           </div>
         ),
         key: `/projects/${project.id}`, // Adjusted path to match route
@@ -236,6 +275,7 @@ function App() {
     },
     { label: "Test", key: "/test" }, // Matches the Test route
   ];
+  
 
   return (
     <div className="App">
@@ -291,7 +331,8 @@ function App() {
           {/* Sider Menu items */}
           <Menu
             mode="inline"
-            defaultSelectedKeys={[""]}
+            defaultSelectedKeys={["my-favorites"]}
+            defaultOpenKeys={["my-favorites"]}
             onClick={({ key }) => {
               if (key === "add-project") {
                 showAddProjectModal();
