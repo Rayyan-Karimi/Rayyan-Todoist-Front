@@ -6,19 +6,10 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import {
-  Menu,
-  Flex,
-  Layout,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Checkbox,
-  message,
-} from "antd";
+import { Menu, Flex, Layout, Button, Form, message } from "antd";
 import { useMediaQuery } from "react-responsive";
 
+// import ContentDisplay from "./components/element/ContentDisplay";
 import ProjectLabel from "./components/element/ProjectLabel";
 import AddProjectModal from "./components/util/AddProjectModal";
 import EditOrDeleteProjectModal from "./components/util/EditOrDeleteProjectModal";
@@ -51,8 +42,6 @@ function App() {
   const [editOrDeleteProjectForm] = Form.useForm();
   const isLargeScreen = useMediaQuery({ minWidth: 751 });
   const [collapsed, setCollapsed] = useState(false);
-
-  const handleCollapse = () => setCollapsed(!collapsed);
 
   const handleUpdateFavoriteProjectStatus = async () => {
     try {
@@ -242,7 +231,7 @@ function App() {
         <Sider
           width={325}
           style={{
-            background: 'rgb(255, 255, 245)',
+            background: "rgb(255, 255, 245)",
             minHeight: "100vh",
             transform:
               isLargeScreen || collapsed
