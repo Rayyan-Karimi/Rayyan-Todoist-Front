@@ -1,9 +1,11 @@
+import Index from "./Index";
 import AddTaskButton from "../util/AddTaskButton";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { List, Typography, Checkbox, Divider, Tooltip } from "antd";
+import { List, Typography, Checkbox, Tooltip, message } from "antd";
 import { EditOutlined } from "@ant-design/icons";
+import PropTypes from "prop-types";
 
 import { TodoistApi } from "@doist/todoist-api-typescript";
 const apiToken = import.meta.env.VITE_TODOIST_API_TOKEN;
@@ -57,20 +59,20 @@ export default function IndividualProject({ tasks, projects, setTasks }) {
           setTasks((prevTasks) =>
             prevTasks.filter((task) => task.id !== theId)
           );
-          console.log("Task deleted successfully");
+          message.success("Task deleted.");
         }
       })
-      .catch((error) => console.error("Error deleting task:", error));
+      .catch((error) => message.error("Error deleting task:", error));
   };
 
   return (
     <div
       style={{
         padding: "20px",
-        maxWidth: "600px",
         margin: "auto",
         height: "80vh",
-        overflowY: "scroll",
+        overflowY: "auto",
+        width: '600px',
       }}
     >
       <Title level={2} style={{ marginBottom: "20px" }}>
@@ -141,6 +143,13 @@ export default function IndividualProject({ tasks, projects, setTasks }) {
       {!isEditing && (
         <AddTaskButton setTasks={setTasks} tasks={tasks} projectId={id} />
       )}
+      {filteredTasks.length === 0 && <Index />}
     </div>
   );
 }
+
+IndividualProject.propTypes = {
+  tasks: PropTypes.array.isRequired,
+  projects: PropTypes.array.isRequired,
+  setTasks: PropTypes.func.isRequired,
+};

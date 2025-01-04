@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button, Modal, Form, Input, DatePicker, Select, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { TodoistApi } from "@doist/todoist-api-typescript";
+import PropTypes from "prop-types";
 
 const { Option } = Select;
 const apiToken = import.meta.env.VITE_TODOIST_API_TOKEN;
@@ -9,7 +10,6 @@ const api = new TodoistApi(apiToken);
 
 export default function AddTaskButton({
   projectId,
-  tasks,
   setTasks,
   isEditing = false,
   setIsEditing,
@@ -119,3 +119,13 @@ export default function AddTaskButton({
     </div>
   );
 }
+
+AddTaskButton.propTypes = {
+  projectId: PropTypes.number.isRequired,
+  tasks: PropTypes.array.isRequired,
+  isEditing: PropTypes.bool.isRequired,
+  onSave: PropTypes.func.isRequired,
+  task: PropTypes.object,
+  setTasks: PropTypes.func.isRequired,
+  setIsEditing: PropTypes.func.isRequired,
+};

@@ -1,28 +1,23 @@
-import { Menu, Flex, Button, Drawer } from "antd";
-import { useState } from "react";
+import { Menu, Flex, Layout, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 
-export default function DrawerComponent({
-  open,
-  setOpen,
-  handleNotificationsLink,
-  menuItems,
-}) {
-  const navigate = useNavigate();
-  const onCloseDrawer = () => {
-    setOpen(false);
-  };
+import AddProjectIcon from "../../assets/AddProjectIcon.svg";
+const { Sider } = Layout;
 
+const LeftSideView = (
+  handleNotificationsLink,
+  showAddProjectModal,
+  menuItems
+) => {
+  const navigate = useNavigate();
+  console.log("In LeftSide, MenutItems are:", menuItems);
   return (
-    <>
-      {/* Drawer */}
-      <Drawer
-        placement={"left"}
+    <div>
+      <Sider
         width={250}
-        onClose={onCloseDrawer}
-        open={open}
-        closable={false}
+        style={{ background: "lightYellow", minHeight: "100vh" }}
       >
+        {/* Sider top buttons */}
         <Flex wrap direction="column" align="center" justify="end">
           <Button
             type="text"
@@ -44,7 +39,11 @@ export default function DrawerComponent({
               ></path>
             </svg>
           </Button>
-          <Button type="text" style={{ padding: 0 }} onClick={onCloseDrawer}>
+          <Button
+            type="text"
+            style={{ padding: 0 }}
+            onClick={() => console.log("Button clicked.")}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -61,14 +60,17 @@ export default function DrawerComponent({
             </svg>
           </Button>
         </Flex>
+        {/* Sider Menu items */}
         <Menu
           mode="inline"
-          defaultSelectedKeys={["today"]}
-          defaultOpenKeys={["myProjects"]}
-          items={menuItems}
+          defaultSelectedKeys={["my-favorites"]}
+          defaultOpenKeys={["my-favorites"]}
           onClick={({ key }) => {
-            setOpen(false);
-            navigate(key); // Navigate directly to the path defined in 'key'
+            if (key === "add-project") {
+              showAddProjectModal();
+            } else {
+              navigate(key); // Navigate directly to the path defined in 'key'
+            }
           }}
           style={{
             marginTop: "3vh",
@@ -76,8 +78,48 @@ export default function DrawerComponent({
             background: "inherit",
             border: "none",
           }}
-        />
-      </Drawer>
-    </>
+        >
+          <Menu.Item
+            key="add-project"
+            icon={
+              <img
+                src={AddProjectIcon}
+                alt="Add Project Icon"
+                style={{ width: 16, height: 16 }}
+              />
+            }
+          >
+            Add Project
+          </Menu.Item>
+
+          {/* <TestIcon style={{ width: 24, height: 24 }} /> */}
+
+          {menuItems.map((menuItem) => {
+            if (menuItem.children && menuItem.children.length > 0) {
+              // Render a SubMenu for items with children
+              return (
+                <Menu.SubMenu
+                  key={menuItem.key}
+                  icon={menuItem.icon}
+                  title={menuItem.label}
+                >
+                  {menuItem.children.map((child) => (
+                    <Menu.Item key={child.key}>{child.label}</Menu.Item>
+                  ))}
+                </Menu.SubMenu>
+              );
+            }
+            // Render regular Menu.Item
+            return (
+              <Menu.Item key={menuItem.key} icon={menuItem.icon}>
+                {menuItem.label}
+              </Menu.Item>
+            );
+          })}
+        </Menu>
+      </Sider>
+    </div>
   );
-}
+};
+
+export default LeftSideView;

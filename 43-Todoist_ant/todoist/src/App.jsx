@@ -6,15 +6,26 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import { Menu, Flex, Layout, Button, Modal, Form, Input, Checkbox } from "antd";
+import {
+  Menu,
+  Flex,
+  Layout,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Checkbox,
+  message,
+} from "antd";
 
+// import RightSideLayout from "./components/element/RightSideLayout";
+// import LeftSideView from "./components/element/LeftSideView";
+import AddProjectModal from "./components/util/AddProjectModal";
+import EditOrDeleteProjectModal from "./components/util/EditOrDeleteProjectModal";
+import AddProjectIcon from "./assets/AddProjectIcon.svg";
 import Index from "./components/pages/Index";
 import IndividualProject from "./components/pages/IndividualProject";
 import ProjectActionsDropdown from "./components/util/ProjectActionsDropdown";
-// import DrawerComponent from "./components/util/DrawerComponent";
-import AddProjectIcon from "./assets/AddProjectIcon.svg";
-// import { ReactComponent as AddProjectIcon } from "./assets/AddProjectIcon.svg";
-// import { ReactComponent as TestIcon } from "./assets/TestIcon.svg";
 
 const { Sider, Header, Content, Footer } = Layout;
 
@@ -28,7 +39,6 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  // const [open, setOpen] = useState(false);
   const [isAddProjectModalVisible, setIsAddProjectModalVisible] =
     useState(false);
   const addProjectForm = Form.useForm();
@@ -52,31 +62,18 @@ function App() {
           project.id !== updatedProject.id ? project : updatedProject
         )
       );
-      console.log("Updated favorite successfully.");
+      message.success("Updated favorite successfully.");
     } catch (err) {
-      console.error("Error updating favorite:", err);
+      message.error("Error updating favorite:", err);
     } finally {
       handleCancelForEditOrDeleteProject();
     }
   };
 
-  const onUpdateProject = (updatedProject) => {
-    setProjects((prevProjects) =>
-      prevProjects.map((project) =>
-        project.id === updatedProject.id
-          ? { ...project, ...updatedProject }
-          : project
-      )
-    );
-  };
-
   const showProjectActionsModal = (project, type) => {
-    console.log("sel proj:", project);
     setSelectedProject(project);
     setActionTypeOnProject(type); // 'edit' or 'delete'
-    console.log("Sleected action:", type);
     setIsEditOrDeleteProjectModalVisible(true);
-    console.log("Modal is viisble");
     if (type === "edit") {
       editOrDeleteProjectForm.setFieldsValue({
         name: project.name,
@@ -84,6 +81,7 @@ function App() {
       });
     }
   };
+
   const handleCancelForEditOrDeleteProject = () => {
     setIsEditOrDeleteProjectModalVisible(false);
     setSelectedProject(null);
@@ -103,9 +101,9 @@ function App() {
       );
 
       editOrDeleteProjectForm.resetFields();
-      console.log("Updated project successfully.");
+      message.success("Updated project successfully.");
     } catch (err) {
-      console.error("Error updating project:", err);
+      message.error("Error updating project:", err);
     } finally {
       handleCancelForEditOrDeleteProject();
     }
@@ -117,20 +115,18 @@ function App() {
       setProjects((prev) =>
         prev.filter((project) => project.id !== selectedProject.id)
       );
-      console.log("Deleted project successfully.");
+      message.success("Deleted project successfully.");
     } catch (err) {
-      console.error("Error deleting project:", err);
+      message.error("Error deleting project:", err);
     } finally {
       handleCancelForEditOrDeleteProject();
     }
   };
 
   const showAddProjectModal = () => {
-    console.log("Showing add projects modal");
     setIsAddProjectModalVisible(true);
   };
   const handleModalCancelForAddProject = () => {
-    console.log("Handling cancel for add projects modal");
     setIsAddProjectModalVisible(false);
     addProjectForm.resetFields();
   };
@@ -141,11 +137,8 @@ function App() {
         name: projectTitle,
         isFavorite,
       });
-      console.log("You tried to create new project:", newProject);
       setProjects((prev) => [...prev, newProject]);
-      console.log("Setting projects to add this new project.");
       setIsAddProjectModalVisible(false);
-      console.log("Closed Modal for add project.");
       addProjectForm.resetFields();
     } catch (err) {
       console.error("Error adding project:", err);
@@ -155,18 +148,13 @@ function App() {
   // Fetch
   useEffect(() => {
     setIsLoading(true);
+    console.log("Hi");
     Promise.all([api.getProjects(), api.getTasks()])
       .then(([fetchedProjects, fetchedTasks]) => {
-        setProjects(fetchedProjects.slice(1)); // Exclude the first project
+        setProjects(fetchedProjects); // Exclude the first project
         setTasks(fetchedTasks);
-        console.log("Fetched Projects:", fetchedProjects);
-        console.log("Fetched Tasks:", fetchedTasks);
         setIsLoading(false);
         setHasError(false);
-      })
-      .then(() => {
-        console.log("Projects:", projects);
-        console.log("Tasks:", tasks);
       })
       .catch((error) => {
         console.error(error);
@@ -181,9 +169,6 @@ function App() {
     return <>Error loading data. Please check Login Token.</>;
   }
 
-  // const onOpenDrawer = () => {
-  //   setOpen(true);
-  // };
   const handleNotificationsLink = () => {
     navigate("/notifications");
   };
@@ -222,7 +207,6 @@ function App() {
                     handleUpdateFavoriteProjectStatus
                   }
                   showProjectActionsModal={showProjectActionsModal}
-                  onUpdateProject={onUpdateProject}
                 />
               </div>
             </div>
@@ -231,7 +215,7 @@ function App() {
         })),
     },
     {
-      key: "my-projects",
+      key: "my-projects", // Matches the route
       label: "My Projects",
       icon: <ProfileOutlined />,
       children: projects.map((project) => ({
@@ -261,7 +245,6 @@ function App() {
                   handleUpdateFavoriteProjectStatus
                 }
                 showProjectActionsModal={showProjectActionsModal}
-                onUpdateProject={onUpdateProject}
               />
             </div>
           </div>
@@ -269,8 +252,8 @@ function App() {
         key: `/projects/${project.id}`,
       })),
     },
-    { label: "Test", key: "/test" }, // Matches the Test route
   ];
+  console.log("Right before menu items are:", menuItems);
 
   return (
     <div className="App">
@@ -383,10 +366,11 @@ function App() {
         </Sider>
 
         {/* Right side Layout */}
-        <Layout>
+        <Layout style={{ background: "white" }}>
           <Header style={{ background: "white" }}>
-            Todoist Clone
-            {/* @TODO: add bbreadcrumbs */}
+            {selectedProject && selectedProject.isFavorite === true
+              ? `My Favorites /`
+              : `My Projects /`}
           </Header>
           <Content style={{ minHeight: "70vh" }}>
             <ContentDisplay
@@ -395,118 +379,26 @@ function App() {
               setTasks={setTasks}
             />
           </Content>
-          <Footer>Todoist Clone ©2024</Footer>
+          <Footer style={{ background: "white" }}>Todoist Clone ©2024</Footer>
         </Layout>
       </Layout>
 
       {/* Project actions modal */}
-      <Modal
-        title={
-          actionTypeOnProject === "edit" ? "Edit Project" : "Delete Project"
-        }
-        visible={isEditOrDeleteProjectModalVisible}
+      <EditOrDeleteProjectModal
+        actionTypeOnProject={actionTypeOnProject}
+        isVisible={isEditOrDeleteProjectModalVisible}
         onCancel={handleCancelForEditOrDeleteProject}
-        footer={null}
-      >
-        {actionTypeOnProject === "edit" ? (
-          <Form
-            form={editOrDeleteProjectForm}
-            layout="vertical"
-            onFinish={handleEditProjectFormSubmit}
-          >
-            <Form.Item
-              label="Project Title"
-              name="name"
-              rules={[
-                { required: true, message: "Please input your project name!" },
-              ]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="isFavorite"
-              valuePropName="checked" // Ensures the checkbox state is properly managed
-            >
-              <Checkbox>Mark as Favorite</Checkbox>
-            </Form.Item>
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{ marginRight: 8 }}
-              >
-                Save Changes
-              </Button>
-              <Button onClick={handleCancelForEditOrDeleteProject}>
-                Cancel
-              </Button>
-            </Form.Item>
-          </Form>
-        ) : (
-          <div>
-            <p>Are you sure you want to delete this project?</p>
-            <Button
-              type="primary"
-              danger
-              onClick={handleDeleteProject}
-              style={{ marginRight: 8 }}
-            >
-              Delete
-            </Button>
-            <Button onClick={handleCancelForEditOrDeleteProject}>Cancel</Button>
-          </div>
-        )}
-      </Modal>
+        onEditSubmit={handleEditProjectFormSubmit}
+        onDelete={handleDeleteProject}
+        form={editOrDeleteProjectForm}
+      />
 
       {/* Add Project Modal */}
-      <Modal
-        title="Add New Project"
-        visible={isAddProjectModalVisible}
+      <AddProjectModal
+        isVisible={isAddProjectModalVisible}
         onCancel={handleModalCancelForAddProject}
-        footer={null} // Use Form buttons instead
-      >
-        <Form
-          name="basic"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          initialValues={{ remember: true }}
-          onFinish={handleFormSubmitForAddProject}
-          onFinishFailed={handleModalCancelForAddProject}
-          autoComplete="off"
-        >
-          <Form.Item
-            label="Project Title"
-            name="projectTitle"
-            rules={[
-              { required: true, message: "Please input your project title!" },
-            ]}
-          >
-            <Input placeholder="Enter project title" />
-          </Form.Item>
-
-          <Form.Item
-            name="isFavorite"
-            valuePropName="checked"
-            wrapperCol={{ offset: 8, span: 16 }}
-          >
-            <Checkbox>Mark as Favorite</Checkbox>
-          </Form.Item>
-
-          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-            <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
-              Add Project
-            </Button>
-            <Button onClick={handleModalCancelForAddProject}>Cancel</Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* <DrawerComponent
-        open={open}
-        setOpen={setOpen}
-        handleNotificationsLink={handleNotificationsLink}
-        menuItems={menuItems}
-      /> */}
+        onSubmit={handleFormSubmitForAddProject}
+      />
     </div>
   );
 }

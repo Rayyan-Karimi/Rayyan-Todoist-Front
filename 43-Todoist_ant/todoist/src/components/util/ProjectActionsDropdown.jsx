@@ -1,5 +1,6 @@
-import React from "react";
-import { Menu, Dropdown, Tooltip } from "antd";
+// Project Actions Dropdown
+import PropTypes from "prop-types";
+import { Menu, Dropdown } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -11,7 +12,6 @@ import {
 const ProjectActionsDropdown = ({
   project,
   showProjectActionsModal,
-  onUpdateProject,
   handleUpdateFavoriteProjectStatus,
 }) => {
   const menu = (
@@ -46,11 +46,19 @@ const ProjectActionsDropdown = ({
 
   return (
     <Dropdown overlay={menu} trigger={["click"]}>
-      <Tooltip title="Show Actions">
-        <MoreOutlined style={{ cursor: "pointer" }} />
-      </Tooltip>
+      <MoreOutlined style={{ cursor: "pointer" }} />
     </Dropdown>
   );
+};
+
+ProjectActionsDropdown.propTypes = {
+  project: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    isFavorite: PropTypes.bool.isRequired,
+  }).isRequired,
+  showProjectActionsModal: PropTypes.func.isRequired,
+  handleUpdateFavoriteProjectStatus: PropTypes.func.isRequired,
 };
 
 export default ProjectActionsDropdown;
