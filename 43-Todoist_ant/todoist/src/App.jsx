@@ -19,6 +19,7 @@ import {
 } from "antd";
 import { useMediaQuery } from "react-responsive";
 
+import ProjectLabel from "./components/element/ProjectLabel";
 import AddProjectModal from "./components/util/AddProjectModal";
 import EditOrDeleteProjectModal from "./components/util/EditOrDeleteProjectModal";
 import AddProjectIcon from "./assets/AddProjectIcon.svg";
@@ -181,34 +182,14 @@ function App() {
         .filter((project) => project.isFavorite)
         .map((project) => ({
           label: (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "12px",
-              }}
-              onClick={() => setSelectedProject(project)}
-            >
-              <div
-                style={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  maxWidth: 120,
-                }}
-                title={project.name}
-              >
-                {project.name}
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <ProjectActionsDropdown
-                  project={project}
-                  handleUpdateFavoriteProjectStatus={
-                    handleUpdateFavoriteProjectStatus
-                  }
-                  showProjectActionsModal={showProjectActionsModal}
-                />
-              </div>
-            </div>
+            <ProjectLabel
+              project={project}
+              setSelectedProject={setSelectedProject}
+              handleUpdateFavoriteProjectStatus={
+                handleUpdateFavoriteProjectStatus
+              }
+              showProjectActionsModal={showProjectActionsModal}
+            />
           ),
           key: `/projects/${project.id}`,
         })),
@@ -252,7 +233,6 @@ function App() {
       })),
     },
   ];
-  console.log("Right before menu items are:", menuItems);
 
   return (
     <div className="App">
@@ -260,9 +240,9 @@ function App() {
         {/* Left side Sider */}
         {/* Small screen sidebar */}
         <Sider
-          width={250}
+          width={325}
           style={{
-            background: "lightYellow",
+            background: 'rgb(255, 255, 245)',
             minHeight: "100vh",
             transform:
               isLargeScreen || collapsed
@@ -393,10 +373,10 @@ function App() {
         {/* Large screen sidebar */}
         {isLargeScreen && !collapsed && (
           <Sider
-            width={250}
+            width={325}
             style={{
-              background: "lightYellow",
-              minHeight: "100vh"
+              background: "rgb(255, 255, 225)",
+              minHeight: "100vh",
             }}
           >
             {/* Sider top buttons */}
