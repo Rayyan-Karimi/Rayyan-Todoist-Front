@@ -1,14 +1,9 @@
-import { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
-import { Menu, Flex, Layout, Button, Form, message } from "antd";
-import { useMediaQuery } from "react-responsive";
+import { Menu, Flex, Layout, Button } from "antd";
+import PropTypes from "prop-types";
 
-const { Sider, Header, Content, Footer } = Layout;
+const { Sider } = Layout;
+
+import AddProjectIcon from "../../assets/AddProjectIcon.svg";
 
 // LeftSider Component
 const LeftSider = ({
@@ -30,6 +25,21 @@ const LeftSider = ({
     </Sider>
   );
 };
+
+/**
+  menuItems,
+  showAddProjectModal
+ */
+LeftSider.propTypes = {
+  collapsed: PropTypes.bool.isRequired,
+  setCollapsed: PropTypes.func.isRequired,
+  isLargeScreen: PropTypes.bool.isRequired,
+  navigate: PropTypes.any.isRequired,
+  menuItems: PropTypes.array.isRequired,
+  showAddProjectModal: PropTypes.func.isRequired,
+};
+
+export default LeftSider;
 
 const getLeftSiderStyle = (isLargeScreen, collapsed) => ({
   background: "rgb(255, 255, 245)",
@@ -54,6 +64,11 @@ const SiderHeader = ({ collapsed, setCollapsed }) => (
     </Button>
   </Flex>
 );
+
+SiderHeader.propTypes = {
+  collapsed: PropTypes.bool.isRequired,
+  setCollapsed: PropTypes.func.isRequired,
+};
 
 const SiderMenu = ({ menuItems, navigate, showAddProjectModal }) => (
   <Menu
@@ -81,9 +96,32 @@ const SiderMenu = ({ menuItems, navigate, showAddProjectModal }) => (
   </Menu>
 );
 
+SiderMenu.propTypes = {
+  menuItems: PropTypes.array.isRequired,
+  navigate: PropTypes.any.isRequired,
+  showAddProjectModal: PropTypes.func.isRequired,
+};
+
 const getSiderMenuStyle = () => ({
   marginTop: "3vh",
   padding: 0,
   background: "inherit",
   border: "none",
 });
+
+const renderMenuItem = (menuItem) =>
+  menuItem.children && menuItem.children.length > 0 ? (
+    <Menu.SubMenu
+      key={menuItem.key}
+      icon={menuItem.icon}
+      title={menuItem.label}
+    >
+      {menuItem.children.map((child) => (
+        <Menu.Item key={child.key}>{child.label}</Menu.Item>
+      ))}
+    </Menu.SubMenu>
+  ) : (
+    <Menu.Item key={menuItem.key} icon={menuItem.icon}>
+      {menuItem.label}
+    </Menu.Item>
+  );
