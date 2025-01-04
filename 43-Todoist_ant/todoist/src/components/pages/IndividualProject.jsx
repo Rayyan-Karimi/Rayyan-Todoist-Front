@@ -89,14 +89,16 @@ export default function IndividualProject({ tasks, projects, setTasks }) {
                 display: "flex",
                 justifyContent: "space-between",
                 gap: "10px",
-                width: '100%',
+                width: "100%",
               }}
               className="task-item"
             >
-              <Checkbox
-                checked={task.isCompleted}
-                onClick={() => handleDeleteTask(task.id)}
-              />
+              <Tooltip title="Delete Task?">
+                <Checkbox
+                  checked={task.isCompleted}
+                  onClick={() => handleDeleteTask(task.id)}
+                />
+              </Tooltip>
               <div
                 style={{
                   display: "flex",
@@ -107,7 +109,7 @@ export default function IndividualProject({ tasks, projects, setTasks }) {
               >
                 <div>
                   <Text strong>{task.content}</Text>
-                  <Tooltip title="Edit Task">
+                  <Tooltip title="Edit Task?">
                     <EditOutlined
                       className="edit-icon"
                       onClick={() => handleEditClick(task)}

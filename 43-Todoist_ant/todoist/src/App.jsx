@@ -1,33 +1,16 @@
 import { useState, useEffect } from "react";
-import {
-  PlusOutlined,
-  ProjectOutlined,
-  ProfileOutlined,
-  RightOutlined,
-  DownOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { ProjectOutlined, ProfileOutlined } from "@ant-design/icons";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useNavigate,
 } from "react-router-dom";
-import {
-  Menu,
-  Flex,
-  Layout,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Checkbox,
-  Tooltip,
-} from "antd";
+import { Menu, Flex, Layout, Button, Modal, Form, Input, Checkbox } from "antd";
 
 import Index from "./components/pages/Index";
 import IndividualProject from "./components/pages/IndividualProject";
+import ProjectActionsDropdown from "./components/util/ProjectActionsDropdown";
 // import DrawerComponent from "./components/util/DrawerComponent";
 import AddProjectIcon from "./assets/AddProjectIcon.svg";
 // import { ReactComponent as AddProjectIcon } from "./assets/AddProjectIcon.svg";
@@ -56,6 +39,36 @@ function App() {
   const [actionTypeOnProject, setActionTypeOnProject] = useState("");
   const [selectedProject, setSelectedProject] = useState(null);
   const [editOrDeleteProjectForm] = Form.useForm();
+
+  const handleUpdateFavoriteProjectStatus = async () => {
+    try {
+      const updatedProject = {
+        ...selectedProject,
+        isFavorite: !selectedProject.isFavorite,
+      };
+      await api.updateProject(selectedProject.id, updatedProject);
+      setProjects((prev) =>
+        prev.map((project) =>
+          project.id !== updatedProject.id ? project : updatedProject
+        )
+      );
+      console.log("Updated favorite successfully.");
+    } catch (err) {
+      console.error("Error updating favorite:", err);
+    } finally {
+      handleCancelForEditOrDeleteProject();
+    }
+  };
+
+  const onUpdateProject = (updatedProject) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project.id === updatedProject.id
+          ? { ...project, ...updatedProject }
+          : project
+      )
+    );
+  };
 
   const showProjectActionsModal = (project, type) => {
     console.log("sel proj:", project);
@@ -185,48 +198,36 @@ function App() {
         .map((project) => ({
           label: (
             <div
-              className="menu-item-container"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
                 gap: "12px",
               }}
+              onClick={() => setSelectedProject(project)}
             >
-              {/* Name Container */}
               <div
                 style={{
-                  overflow: "hidden", // Prevent overflow
-                  textOverflow: "ellipsis", // Add ellipsis for long names
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                   maxWidth: 120,
                 }}
-                title={project.name} // Tooltip with the full project name
+                title={project.name}
               >
                 {project.name}
               </div>
-              {/* Buttons Container */}
               <div style={{ display: "flex", gap: "8px" }}>
-                <Tooltip title="Edit Project">
-                  <EditOutlined
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showProjectActionsModal(project, "edit");
-                    }}
-                    style={{ cursor: "pointer" }}
-                  />
-                </Tooltip>
-                <Tooltip title="Delete Project">
-                  <DeleteOutlined
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showProjectActionsModal(project, "delete");
-                    }}
-                    style={{ cursor: "pointer" }}
-                  />
-                </Tooltip>
+                <ProjectActionsDropdown
+                  project={project}
+                  handleUpdateFavoriteProjectStatus={
+                    handleUpdateFavoriteProjectStatus
+                  }
+                  showProjectActionsModal={showProjectActionsModal}
+                  onUpdateProject={onUpdateProject}
+                />
               </div>
             </div>
           ),
-          key: `/projects/${project.id}`, // Adjusted path to match route
+          key: `/projects/${project.id}`,
         })),
     },
     {
@@ -236,50 +237,36 @@ function App() {
       children: projects.map((project) => ({
         label: (
           <div
-            className="menu-item-container"
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
               gap: "12px",
-              flexWrap: "nowrap",
             }}
+            onClick={() => setSelectedProject(project)}
           >
-            {/* Name Container */}
             <div
               style={{
-                overflow: "hidden", // Prevent overflow
-                textOverflow: "ellipsis", // Add ellipsis for long names
+                overflow: "hidden",
+                textOverflow: "ellipsis",
                 maxWidth: 120,
               }}
-              title={project.name} // Tooltip with the full project name
+              title={project.name}
             >
               {project.name}
             </div>
-            {/* Buttons Container */}
             <div style={{ display: "flex", gap: "8px" }}>
-              <Tooltip title="Edit Project">
-                <EditOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showProjectActionsModal(project, "edit");
-                  }}
-                  style={{ cursor: "pointer" }}
-                />
-              </Tooltip>
-              <Tooltip title="Delete Project">
-                <DeleteOutlined
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showProjectActionsModal(project, "delete");
-                  }}
-                  style={{ cursor: "pointer" }}
-                />
-              </Tooltip>
+              <ProjectActionsDropdown
+                project={project}
+                handleUpdateFavoriteProjectStatus={
+                  handleUpdateFavoriteProjectStatus
+                }
+                showProjectActionsModal={showProjectActionsModal}
+                onUpdateProject={onUpdateProject}
+              />
             </div>
           </div>
         ),
-        key: `/projects/${project.id}`, // Adjusted path to match route
+        key: `/projects/${project.id}`,
       })),
     },
     { label: "Test", key: "/test" }, // Matches the Test route
