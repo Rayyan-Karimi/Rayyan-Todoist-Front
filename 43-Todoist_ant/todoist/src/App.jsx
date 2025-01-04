@@ -1,33 +1,28 @@
+// React & antd imports
 import { useState, useEffect } from "react";
 import { ProjectOutlined, ProfileOutlined } from "@ant-design/icons";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
-import { Menu, Flex, Layout, Button, Form, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Layout, Form, message } from "antd";
 import { useMediaQuery } from "react-responsive";
 
-// import ContentDisplay from "./components/element/ContentDisplay";
-import ProjectLabel from "./components/element/ProjectLabel";
+// Imports of self made items
+import ProjectLabel from "./components/util/ProjectLabel";
 import AddProjectModal from "./components/util/AddProjectModal";
 import EditOrDeleteProjectModal from "./components/util/EditOrDeleteProjectModal";
-import AddProjectIcon from "./assets/AddProjectIcon.svg";
-import Index from "./components/pages/Index";
-import IndividualProject from "./components/pages/IndividualProject";
 import ProjectActionsDropdown from "./components/util/ProjectActionsDropdown";
-import LeftSider from "./components/element/LeftSider";
+import LeftSiderSmall from "./components/element/LeftSider";
 import RightLayout from "./components/element/RightLayout";
+import LeftSiderToggle from "./components/element/LeftSider-ToggleForLeftSider";
 
-const { Sider, Header, Content, Footer } = Layout;
-
+// API setup
 import { TodoistApi } from "@doist/todoist-api-typescript";
 const apiToken = import.meta.env.VITE_TODOIST_API_TOKEN;
 const api = new TodoistApi(apiToken); // Use an environment variable
 
+// App function
 function App() {
   const navigate = useNavigate();
+
   const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +78,7 @@ function App() {
     setActionTypeOnProject("");
     editOrDeleteProjectForm.resetFields();
   };
+
   const handleEditProjectFormSubmit = async (values) => {
     try {
       const updatedProject = await api.updateProject(selectedProject.id, {
@@ -121,10 +117,12 @@ function App() {
   const showAddProjectModal = () => {
     setIsAddProjectModalVisible(true);
   };
+
   const handleModalCancelForAddProject = () => {
     setIsAddProjectModalVisible(false);
     addProjectForm.resetFields();
   };
+
   const handleFormSubmitForAddProject = async (values) => {
     const { projectTitle, isFavorite } = values;
     try {
@@ -225,27 +223,38 @@ function App() {
     },
   ];
 
+  // Returning HTML
   return (
     <div className="App">
       <Layout>
-      {/* Left side Sider */}
-      <LeftSider
-        collapsed={collapsed}
-        isLargeScreen={isLargeScreen}
-        setCollapsed={setCollapsed}
-        menuItems={menuItems}
-        navigate={navigate}
-        showAddProjectModal={showAddProjectModal}
-      />
+        {/* Left side Sider */}
+        <LeftSiderSmall
+          collapsed={collapsed}
+          isLargeScreen={isLargeScreen}
+          setCollapsed={setCollapsed}
+          menuItems={menuItems}
+          navigate={navigate}
+          showAddProjectModal={showAddProjectModal}
+        />
+        {collapsed && (
+          <LeftSiderToggle
+            collapsed={collapsed}
+            isLargeScreen={isLargeScreen}
+            setCollapsed={setCollapsed}
+            menuItems={menuItems}
+            navigate={navigate}
+            showAddProjectModal={showAddProjectModal}
+          />
+        )}
 
-      {/* Right side Layout */}
-      <RightLayout
-        selectedProject={selectedProject}
-        tasks={tasks}
-        projects={projects}
-        setTasks={setTasks}
-      />
-    </Layout>
+        {/* Right side Layout */}
+        <RightLayout
+          selectedProject={selectedProject}
+          tasks={tasks}
+          projects={projects}
+          setTasks={setTasks}
+        />
+      </Layout>
 
       {/* Project actions modal */}
       <EditOrDeleteProjectModal
@@ -266,28 +275,5 @@ function App() {
     </div>
   );
 }
-
-// function ContentDisplay({ tasks, projects, setTasks }) {
-//   return (
-//     <Routes>
-//       <Route path="/" element={<Index />} />
-//       <Route
-//         path="/projects/:id"
-//         element={
-//           <IndividualProject
-//             tasks={tasks}
-//             projects={projects}
-//             setTasks={setTasks}
-//           />
-//         }
-//       />
-//       <Route path="/test" element={<h3>Test</h3>} />
-//       <Route
-//         path="*"
-//         element={<div>404 - Page Not Found</div>} // Fallback route
-//       />
-//     </Routes>
-//   );
-// }
 
 export default App;

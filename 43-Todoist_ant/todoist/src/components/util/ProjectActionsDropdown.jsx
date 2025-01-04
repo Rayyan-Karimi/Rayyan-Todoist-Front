@@ -49,7 +49,8 @@ const ProjectActionsDropdown = ({
       overlay={menu}
       trigger={["click"]}
       overlayStyle={{
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+        boxShadow:
+          "0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
       }}
     >
       <MoreOutlined style={{ cursor: "pointer" }} />

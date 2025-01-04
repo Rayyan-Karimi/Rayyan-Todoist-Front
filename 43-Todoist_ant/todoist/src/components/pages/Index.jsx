@@ -1,3 +1,4 @@
+// Index Page
 import { Flex } from "antd";
 export default function Index() {
   return (
@@ -6,8 +7,8 @@ export default function Index() {
       align="center"
       style={{
         minHeight: "60%",
-        flexDirection: "column", // Ensure column direction applies properly
-        textAlign: "center", // Align text for heading and paragraph
+        flexDirection: "column", 
+        textAlign: "center", 
       }}
     >
       <img

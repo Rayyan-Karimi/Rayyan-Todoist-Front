@@ -2,7 +2,7 @@ import { Layout } from "antd";
 const { Header, Content, Footer } = Layout;
 import PropTypes from "prop-types";
 
-import ContentDisplay from "./ContentDisplay";
+import ContentDisplay from "./RightLayout-ContentDisplay.jsx";
 
 // RightLayout Component
 const RightLayout = ({ selectedProject, tasks, projects, setTasks }) => (

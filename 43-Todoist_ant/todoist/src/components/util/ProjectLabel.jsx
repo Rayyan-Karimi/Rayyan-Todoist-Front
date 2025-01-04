@@ -1,7 +1,6 @@
-import { useState } from "react";
 import PropTypes from "prop-types";
 
-import ProjectActionsDropdown from "../util/ProjectActionsDropdown";
+import ProjectActionsDropdown from "./ProjectActionsDropdown";
 
 const ProjectLabel = ({
   project,
@@ -9,8 +8,6 @@ const ProjectLabel = ({
   handleUpdateFavoriteProjectStatus,
   showProjectActionsModal,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <div
       style={{
@@ -19,8 +16,6 @@ const ProjectLabel = ({
         gap: "12px",
       }}
       onClick={() => setSelectedProject(project)}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div
         style={{
@@ -32,17 +27,13 @@ const ProjectLabel = ({
       >
         {project.name}
       </div>
-      {isHovered && (
-        // <div style={{ display: "flex", gap: "8px" }}>
-          <ProjectActionsDropdown
-            project={project}
-            handleUpdateFavoriteProjectStatus={
-              handleUpdateFavoriteProjectStatus
-            }
-            showProjectActionsModal={showProjectActionsModal}
-          />
-        // </div>
-      )}
+      <div style={{ display: "flex", gap: "8px" }}>
+        <ProjectActionsDropdown
+          project={project}
+          handleUpdateFavoriteProjectStatus={handleUpdateFavoriteProjectStatus}
+          showProjectActionsModal={showProjectActionsModal}
+        />
+      </div>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+// Single project's view
 import Index from "./Index";
 import AddTaskButton from "../util/AddTaskButton";
 
@@ -72,7 +73,7 @@ export default function IndividualProject({ tasks, projects, setTasks }) {
         margin: "auto",
         height: "80vh",
         overflowY: "auto",
-        width: '600px',
+        width: "600px",
       }}
     >
       <Title level={2} style={{ marginBottom: "20px" }}>
