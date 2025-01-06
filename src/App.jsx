@@ -1,5 +1,5 @@
 // React & antd imports
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { ProjectOutlined, ProfileOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { Layout, Form, message } from "antd";
@@ -21,9 +21,28 @@ const api = new TodoistApi(apiToken); // Use an environment variable
 
 // App function
 function App() {
+  function projectsReducer(projects, action) {
+    console.log("Projects:", projects);
+    console.log("Action", action);
+    switch (action.type) {
+      case "ADD_PROJECT":
+        return [...projects, action.payload];
+      case "EDIT_PROJECT":
+        return projects.map((project) => {
+          if (project.id === action.payload.id) {
+            return action.payload;
+          }
+          return project;
+        });
+      case "DELETE_PROJECT":
+        return projects.filter((project) => project.id !== action.payload);
+      default:
+        return projects;
+    }
+  }
+
   const navigate = useNavigate();
 
-  const [projects, setProjects] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -39,7 +58,75 @@ function App() {
   const [editOrDeleteProjectForm] = Form.useForm();
   const isLargeScreen = useMediaQuery({ minWidth: 751 });
   const [collapsed, setCollapsed] = useState(false);
+  // const [projects, setProjects] = useState([]);
+  const [projects, dispatch] = useReducer(projectsReducer, []);
 
+  // Add project
+  const handleFormSubmitForAddProject = async (values) => {
+    const { projectTitle, isFavorite } = values;
+    try {
+      const newProject = await api.addProject({
+        name: projectTitle,
+        isFavorite,
+      });
+      // setProjects((prev) => [...prev, newProject]);
+      dispatch({
+        type: "ADD_PROJECT",
+        payload: newProject,
+      });
+      setIsAddProjectModalVisible(false);
+      addProjectForm.resetFields();
+    } catch (err) {
+      console.error("Error adding project:", err);
+    }
+  };
+
+  // Update project
+  const handleEditProjectFormSubmit = async (values) => {
+    try {
+      const updatedProject = await api.updateProject(selectedProject.id, {
+        name: values.name,
+        isFavorite: values.isFavorite,
+      });
+      dispatch({
+        type: "UPDATE_PROJECT",
+        payload: updatedProject,
+      });
+      // setProjects((prev) =>
+      //   prev.map((project) =>
+      //     project.id !== updatedProject.id ? project : updatedProject
+      //   )
+      // );
+
+      editOrDeleteProjectForm.resetFields();
+      message.success("Updated project successfully.");
+    } catch (err) {
+      message.error("Error updating project:", err);
+    } finally {
+      handleCancelForEditOrDeleteProject();
+    }
+  };
+
+  // Delete project
+  const handleDeleteProject = async () => {
+    try {
+      await api.deleteProject(selectedProject.id);
+      dispatch({
+        type: "DELETE_PROJECT",
+        payload: selectedProject.id,
+      });
+      // setProjects((prev) =>
+      //   prev.filter((project) => project.id !== selectedProject.id)
+      // );
+      message.success("Deleted project successfully.");
+    } catch (err) {
+      message.error("Error deleting project:", err);
+    } finally {
+      handleCancelForEditOrDeleteProject();
+    }
+  };
+
+  // Favorite update project
   const handleUpdateFavoriteProjectStatus = async () => {
     try {
       const updatedProject = {
@@ -47,11 +134,15 @@ function App() {
         isFavorite: !selectedProject.isFavorite,
       };
       await api.updateProject(selectedProject.id, updatedProject);
-      setProjects((prev) =>
-        prev.map((project) =>
-          project.id !== updatedProject.id ? project : updatedProject
-        )
-      );
+      dispatch({
+        type: "UPDATE_PROJECT",
+        payload: updatedProject,
+      });
+      // setProjects((prev) =>
+      //   prev.map((project) =>
+      //     project.id !== updatedProject.id ? project : updatedProject
+      //   )
+      // );
       message.success("Updated favorite successfully.");
     } catch (err) {
       message.error("Error updating favorite:", err);
@@ -79,41 +170,6 @@ function App() {
     editOrDeleteProjectForm.resetFields();
   };
 
-  const handleEditProjectFormSubmit = async (values) => {
-    try {
-      const updatedProject = await api.updateProject(selectedProject.id, {
-        name: values.name,
-        isFavorite: values.isFavorite,
-      });
-      setProjects((prev) =>
-        prev.map((project) =>
-          project.id !== updatedProject.id ? project : updatedProject
-        )
-      );
-
-      editOrDeleteProjectForm.resetFields();
-      message.success("Updated project successfully.");
-    } catch (err) {
-      message.error("Error updating project:", err);
-    } finally {
-      handleCancelForEditOrDeleteProject();
-    }
-  };
-
-  const handleDeleteProject = async () => {
-    try {
-      await api.deleteProject(selectedProject.id);
-      setProjects((prev) =>
-        prev.filter((project) => project.id !== selectedProject.id)
-      );
-      message.success("Deleted project successfully.");
-    } catch (err) {
-      message.error("Error deleting project:", err);
-    } finally {
-      handleCancelForEditOrDeleteProject();
-    }
-  };
-
   const showAddProjectModal = () => {
     setIsAddProjectModalVisible(true);
   };
@@ -123,31 +179,24 @@ function App() {
     addProjectForm.resetFields();
   };
 
-  const handleFormSubmitForAddProject = async (values) => {
-    const { projectTitle, isFavorite } = values;
-    try {
-      const newProject = await api.addProject({
-        name: projectTitle,
-        isFavorite,
-      });
-      setProjects((prev) => [...prev, newProject]);
-      setIsAddProjectModalVisible(false);
-      addProjectForm.resetFields();
-    } catch (err) {
-      console.error("Error adding project:", err);
-    }
-  };
-
   // Fetch
   useEffect(() => {
     setIsLoading(true);
     console.log("Hi");
     Promise.all([api.getProjects(), api.getTasks()])
       .then(([fetchedProjects, fetchedTasks]) => {
-        setProjects(fetchedProjects); // Exclude the first project
+        fetchedProjects.splice(0, 1).map(
+          (project) =>
+            dispatch({
+              type: "UPDATE_PROJECT",
+              payload: project, // @TODO:
+            }) // Exclude the first project
+        );
         setTasks(fetchedTasks);
         setIsLoading(false);
         setHasError(false);
+        console.log("Projects are:", fetchedProjects);
+        console.log("TAsks are:", fetchedTasks);
       })
       .catch((error) => {
         console.error(error);
@@ -242,7 +291,7 @@ function App() {
         )}
 
         {/* Right side Layout */}
-        <RightLayout 
+        <RightLayout
           selectedProject={selectedProject}
           tasks={tasks}
           projects={projects}
